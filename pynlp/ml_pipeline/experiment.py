@@ -78,6 +78,8 @@ def pipeline(name):
         return pipelines.svm_libsvc_embed()
     elif name == 'svm_sigmoid_embed':
         return pipelines.svm_sigmoid_embed()
+    elif name == 'naive_bayes_counts_lex':
+        return pipelines.naive_bayes_counts_lex()
     else:
         raise ValueError("pipeline name is unknown. You can add a custom pipeline in 'pipelines'")
 

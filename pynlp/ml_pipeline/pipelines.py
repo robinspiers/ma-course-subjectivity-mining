@@ -35,6 +35,10 @@ def naive_bayes_counts():
     return pipeline(preprocessing.std_prep(), representation.count_vectorizer({'min_df': 1}), MultinomialNB())
 
 
+def naive_bayes_counts_lex():
+    return pipeline(preprocessing.lex_prep(), representation.count_vectorizer({'min_df': 1}), MultinomialNB())
+
+
 def naive_bayes_tfidf():
     return pipeline(preprocessing.std_prep(), representation.tfidf_vectorizer(), MultinomialNB())
 
