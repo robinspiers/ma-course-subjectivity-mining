@@ -30,21 +30,20 @@ class Preprocessor(TransformerMixin):
     def fit_transform(self, data, y=None):
         return self.transform(data)
 
-    def identify_in_lexicon(lexicon):
-        """replaces words in a tweet by a label from a lexicon"""
+    def identify_in_lexicon(self, lexicon):
+        """replaces words in a tweet by a label from a lexicon (pos/neg); defaults to 'NEUTRAL'"""
+
         def apply_lexicon(data):
-            tokenizer = TweetTokenizer()
+            self.tokens_from_lexicon = 0
             processed = []
             for tw in data:
-                processed_tweet=[]
-                twTok=tokenizer.tokenize(tw)
-                for token in twTok:
+                processed_tweet = []
+                for token in tw.split():
+                    lex_id = 'neutral'
                     if token in lexicon:
-                        label = lexicon[token]["label"]
-                        processed_tweet.append(label)
-                        #print(processed_tweet)
-                    processed_tweet.append(token)
-
+                        lex_id = lexicon[token]['label']
+                        self.tokens_from_lexicon += 1
+                    processed_tweet.append(lex_id.upper())
                 processed.append(' '.join(t for t in processed_tweet))
             return processed
 

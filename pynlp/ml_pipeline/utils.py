@@ -5,6 +5,31 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics.classification import classification_report
 from keras.models import load_model
 
+def important_features_per_class(vectorizer,classifier,n=80):
+    class_labels = classifier.classes_
+    feature_names =vectorizer.get_feature_names()
+    for i in range(0, len(class_labels)):
+        topn_class = sorted(zip(classifier.feature_count_[0], feature_names),reverse=True)[:n]
+        print('\nImportant features in Class \'{}\''.format(class_labels[i]))
+        for coef, feat in topn_class:
+            print(class_labels[i], coef, feat)
+
+def lexobj2():
+    Dlex={}
+    lex_name="../lexic/hatebase_dict_vua_format.csv"
+
+    df1=pd.read_csv(lex_name,sep=";")
+    #print("\ndataset:{}\tnr of rows:{}\tnr of columns:{}".format(lex_name, df1.shape[0], df1.shape[1]))
+
+    for i, row in df1.iterrows():
+        entry = df1.loc[i]['Entry']
+        pos = df1.loc[i]['Pos']
+        label = df1.loc[i]['Label']
+        Dlex[entry]={}
+        Dlex[entry]["label"]=label
+        Dlex[entry]["pos"] = pos
+    return Dlex
+
 
 # ----------- data extraction and splitting ----------------------
 
@@ -62,8 +87,14 @@ def grid_search(pipeline, parameters, train_X, train_y, test_X):
 
 # ----------- evaluation --------------------------
 
-def eval(test_y, sys_y):
+def eval(test_y, sys_y, save, path):
+    if save:
+        print("CHECKINGGG")
+        report_d = classification_report(test_y, sys_y, output_dict= True)
+        df = pd.DataFrame(report_d).transpose()
+        df.to_csv(path, sep=";")
     return classification_report(test_y, sys_y)
+
 
 
 # ----------- saving / loading --------------------
@@ -124,21 +155,5 @@ def hate_lexicon():
         label = df1.loc[i]['Label']
         Dlex[entry] = {}
         Dlex[entry]["label"] = label
-        Dlex[entry]["pos"] = pos
-    return Dlex
-
-
-def lexobj2():
-    Dlex={}
-    lex_name="../lexic/hatebase_dict_vua_format.csv"
-    df1=pd.read_csv(lex_name,sep=";")
-    #print("\ndataset:{}\tnr of rows:{}\tnr of columns:{}".format(lex_name, df1.shape[0], df1.shape[1]))
-
-    for i, row in df1.iterrows():
-        entry = df1.loc[i]['Entry']
-        pos = df1.loc[i]['Pos']
-        label = df1.loc[i]['Label']
-        Dlex[entry]={}
-        Dlex[entry]["label"]=label
         Dlex[entry]["pos"] = pos
     return Dlex

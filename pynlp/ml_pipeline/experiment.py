@@ -1,5 +1,6 @@
 import logging
 import sys
+from pathlib import Path
 
 from tasks import vua_format as vf
 from ml_pipeline import utils, cnn, preprocessing, pipeline_with_lexicon
@@ -14,10 +15,14 @@ formatter = logging.Formatter('%(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+def run(task_name, data_dir, pipeline_name, print_predictions, train_file, test_file,
+        save, result_file = "test.csv"):
 
-def run(task_name, data_dir, pipeline_name, print_predictions):
+    Path("results").mkdir(exist_ok=True)
+    str_path = "results/" + result_file
+
     logger.info('>> Running {} experiment'.format(task_name))
-    tsk = task(task_name)
+    tsk = task(task_name, train_file,test_file)
     logger.info('>> Loading data...')
     tsk.load(data_dir)
     logger.info('>> retrieving train/data instances...')
@@ -40,16 +45,16 @@ def run(task_name, data_dir, pipeline_name, print_predictions):
     sys_y = pipe.predict(test_X)
 
     logger.info('>> evaluation...')
-    logger.info(utils.eval(test_y, sys_y))
+    logger.info(utils.eval(test_y, sys_y, save, str_path))
 
     if print_predictions:
         logger.info('>> predictions')
         utils.print_all_predictions(test_X_ref, test_y, sys_y, logger)
 
 
-def task(name):
+def task(name, train, test):
     if name == 'vua_format':
-        return vf.VuaFormat()
+        return vf.VuaFormat(train,test)
     else:
         raise ValueError("task name is unknown. You can add a custom task in 'tasks'")
 
@@ -82,7 +87,3 @@ def pipeline(name):
         return pipelines.naive_bayes_counts_lex()
     else:
         raise ValueError("pipeline name is unknown. You can add a custom pipeline in 'pipelines'")
-
-
-
-
